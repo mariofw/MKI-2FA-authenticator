@@ -19,12 +19,29 @@
         </div>
     </div>
     <script>
+
+        function logoutUser() {
+            // remove any localStorage keys that represent the current user/session
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('currentUser') || key === 'authToken' || key === 'session' || key === 'loggedIn') {
+                    localStorage.removeItem(key);
+                }
+            });
+            // return to login page
+            window.location.href = 'index.html';
+       }
+
         // Check if user is logged in
         const currentEmail = localStorage.getItem("currentUser.email");
         if (!currentEmail) {
             alert("Please login first.");
             window.location.href = "index.html";
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) logoutButton.addEventListener('click', logoutUser);
+        });
     </script>
 </body>
 </html>

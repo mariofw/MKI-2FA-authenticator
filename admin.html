@@ -74,6 +74,18 @@
             });
         }
 
+          // Logout - clear session keys only and redirect to login
+        function logoutUser() {
+            // remove any localStorage keys that represent the current user/session
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('currentUser') || key === 'authToken' || key === 'session' || key === 'loggedIn') {
+                    localStorage.removeItem(key);
+                }
+            });
+            // return to login page
+            window.location.href = 'index.html';
+       }
+
         // Check if user is admin
         const currentEmail = localStorage.getItem("currentUser.email");
         if (!currentEmail || (currentEmail !== "admin@admin.com" && currentEmail !== "mrakaazwar@gmail.com")) {
@@ -82,6 +94,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', renderTable);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable();
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) logoutButton.addEventListener('click', logoutUser);
+        });
     </script>
 </body>
 </html>
