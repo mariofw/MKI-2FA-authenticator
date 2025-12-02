@@ -1,6 +1,7 @@
+/* === PAGE BACKGROUND === */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -9,9 +10,9 @@ body {
 }
 
 .container {
-    max-width: 400px;
+    max-width: 450px;
     width: 100%;
-    background: white;
+    background: #fff;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -28,29 +29,69 @@ p {
     text-align: center;
     color: #666;
     margin-bottom: 20px;
-    line-height: 1.5;
 }
 
-input {
-    padding: 12px 15px;
+#qrcode {
+    text-align: center;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+#qrcode img {
     width: 200px;
-    font-size: 16px;
-    margin: 10px 0;
+    height: 200px;
+    border-radius: 8px;
+}
+
+.token-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.input-wrap {
+    position: relative;
+    width: 200px;
+}
+
+#token {
+    width: 100%;
+    padding: 12px 40px 12px 14px;
+    font-size: 18px;
     border: 2px solid #e1e5e9;
     border-radius: 6px;
     text-align: center;
-    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-input:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+#toggle-visibility {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #444;
 }
 
-button {
+/* === MESSAGE === */
+.message {
+    font-size: 14px;
+    min-height: 18px;
+    text-align: center;
+}
+
+.message.error { color: #b00020; }
+.message.success { color: #0a7a07; }
+
+/* === VERIFY BUTTON === */
+#verify-btn {
     padding: 12px 24px;
-    margin-top: 20px;
     font-size: 16px;
     background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
@@ -58,23 +99,22 @@ button {
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.3s ease;
 }
 
-button:hover {
+#verify-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.3);
 }
 
+/* === LINK === */
 .trouble-link {
-    margin-top: 20px;
     text-align: center;
+    margin-top: 15px;
 }
 
 .trouble-link a {
     color: #007bff;
     text-decoration: none;
-    font-size: 14px;
 }
 
 .trouble-link a:hover {
