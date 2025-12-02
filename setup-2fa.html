@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Setup 2FA</title>
+    <link rel="stylesheet" href="setup-2fa.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Set up Two-Factor Authentication</h2>
+        <p>Scan the QR code with Google Authenticator or Authy to connect your account:</p>
+
+        <div id="qrcode">
+            <!-- QR will be injected here -->
+        </div>
+
+        <!-- manual secret removed per request -->
+
+        <p>Enter the 6-digit code from your authenticator app to verify:</p>
+        <input id="token" placeholder="000000" maxlength="6" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]*">
+        <br>
+        <button id="verify-btn">Verify & Enable 2FA</button>
+
+        <div class="trouble-link">
+            <p><a href="index.html">← Back to Login</a></p>
+        </div>
+    </div>
+
+  <script>
+    (function () {
+        const email = localStorage.getItem("currentUser.email");
+        if (!email) {
+            alert("No user session found. Please login again.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        const QR_ENDPOINT = `http://localhost:5500/api/generate-2fa?email=${encodeURIComponent(email)}`;
+        const VERIFY_ENDPOINT = `http://localhost:5500/api/verify-2fa`;
+
+        const qrcodeEl = document.getElementById('qrcode');
+        const tokenInput = document.getElementById('token');
+        const verifyBtn = document.getElementById('verify-btn');
+
+        // show a small inline message element for errors
+        function showInlineError(msg) {
+            qrcodeEl.innerHTML = `<div style="color: #b00020; text-align:center; padding: 12px;">${msg}</div>`;
+        }
+
+        async function loadQRCode() {
+            try {
+                qrcodeEl.innerHTML = 'Loading QR…';
+                const res = await fetch(QR_ENDPOINT, { method: 'GET' });
+                if (!res.ok) {
+                    const body = await res.text().catch(()=>null);
+                    console.error('Non-OK response from QR endpoint:', res.status, body);
+                    showInlineError('Failed to load QR code (server error). Check server logs.');
+                    return;
+                }
+
+                const data = await res.json();
+                if (data.error) {
+                    console.error('API returned error:', data);
+                    showInlineError('Failed to load QR code: ' + (data.error || 'unknown error'));
+                    return;
+                }
+
+                if (!data.qrCodeDataURL) {
+                    console.error('No qrCodeDataURL in response:', data);
+                    showInlineError('Failed: invalid server response');
+                    return;
+                }
+
+                qrcodeEl.innerHTML = `<img src="${data.qrCodeDataURL}" alt="QR Code" width="200" height="200" style="display:block; margin: 0 auto;">`;
+            } catch (err) {
+                console.error('QR generation error (fetch failed):', err);
+                showInlineError('Failed to load QR code. Is the backend running on http://localhost:5500 ?');
+            }
+        }
+
+        loadQRCode();
+
+        // Require explicit click for verify (no auto-submit)
+        verifyBtn.addEventListener('click', async function () {
+            const token = tokenInput.value.trim();
+            if (!/^\d{6}$/.test(token)) {
+                alert("Please enter a valid 6-digit code.");
+                return;
+            }
+
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verifying...';
+
+            try {
+                const res = await fetch(VERIFY_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, token })
+                });
+
+                if (!res.ok) {
+                    const body = await res.text().catch(()=>null);
+                    console.error('Non-OK response from verify endpoint:', res.status, body);
+                    alert('Verification failed (server error). Check console.');
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify & Enable 2FA';
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data.verified) {
+                    alert("❌ Invalid code. Please try again.");
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify & Enable 2FA';
+                    return;
+                }
+
+                alert("✅ 2FA Enabled Successfully!");
+                localStorage.setItem(`2fa.${email}.enabled`, "true");
+
+                // redirect
+                if (email === "admin@admin.com" || email === "mrakaazwar@gmail.com") {
+                    window.location.href = "admin.html";
+                } else {
+                    window.location.href = "home.html";
+                }
+            } catch (err) {
+                console.error('Verification fetch error:', err);
+                alert('Verification failed (network error).');
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify & Enable 2FA';
+            }
+        });
+
+        // UX: enable button only when token looks right
+        tokenInput.addEventListener('input', () => {
+            verifyBtn.disabled = !(tokenInput.value.trim().length === 6);
+        });
+
+        verifyBtn.disabled = true;
+    })();
+  </script>
+</body>
+</html>

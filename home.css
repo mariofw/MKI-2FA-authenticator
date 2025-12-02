@@ -1,0 +1,47 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.header h1 {
+    color: #333;
+    font-weight: 600;
+}
+
+#logout-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#logout-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+.content {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.content h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.content p {
+    color: #666;
+    font-size: 18px;
+    line-height: 1.6;
+}
