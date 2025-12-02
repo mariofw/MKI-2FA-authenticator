@@ -1,47 +1,216 @@
-.header {
+/* General Body Styles */
+html, body {
+    height: 100%; /* Make html and body full height */
+    width: 100%; /* Make html and body full width */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #f7f9fa;
+    color: #333;
+    font-family: "PayPal-Sans", "Helvetica Neue", sans-serif;
+}
+
+.paypal-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    width: 100%; /* Make paypal-container full width */
+}
+
+/* Header */
+.paypal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e9ecef;
+    background-color: #fff;
+    padding: 15px 30px;
+    /* Removed border-radius and box-shadow to prevent background showing */
+    flex-shrink: 0; /* Prevent header from shrinking */
 }
 
-.header h1 {
-    color: #333;
-    font-weight: 600;
+.paypal-header .logo i {
+    font-size: 2.5rem;
+    color: #003087;
 }
 
-#logout-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    color: #fff;
-    font-size: 16px;
+.paypal-header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+}
+
+.paypal-header nav a {
+    text-decoration: none;
+    color: #515354;
     font-weight: 500;
-    cursor: pointer;
+    padding: 10px;
+    border-bottom: 2px solid transparent;
     transition: all 0.3s ease;
 }
 
+.paypal-header nav a.active, .paypal-header nav a:hover {
+    color: #0070ba;
+    border-bottom-color: #0070ba;
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-menu i {
+    font-size: 1.4rem;
+    color: #515354;
+    cursor: pointer;
+}
+
+#logout-button {
+    background-color: #0070ba;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
 #logout-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    background-color: #005ea6;
 }
 
-.content {
+/* Main Content */
+.paypal-main {
+    flex-grow: 1; /* Allow main to grow and fill space */
+    padding: 30px; /* Add some padding back */
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    min-height: 100%; /* Ensure main content takes full height */
+}
+
+/* Balance Card */
+.balance-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     text-align: center;
-    padding: 40px 20px;
+    margin-bottom: 30px;
 }
 
-.content h2 {
+.balance-card h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    color: #515354;
+}
+
+.balance-amount {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #003087;
+    margin: 10px 0;
+}
+
+.balance-actions button {
+    background: none;
+    border: 1px solid #0070ba;
+    color: #0070ba;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: all 0.3s;
+}
+
+.balance-actions button:hover {
+    background-color: #0070ba;
+    color: white;
+}
+
+/* Recent Activity */
+.recent-activity {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.recent-activity h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
     color: #333;
-    margin-bottom: 20px;
-    font-weight: 600;
 }
 
-.content p {
+.activity-filters {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.activity-filters input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.activity-filters button {
+    padding: 10px 15px;
+    background-color: #f0f2f4;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.recent-activity ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f2f4;
+}
+
+.activity-icon {
+    font-size: 1.8rem;
+    color: #0070ba;
+    margin-right: 20px;
+    width: 40px;
+    text-align: center;
+}
+
+.activity-details {
+    flex-grow: 1;
+}
+
+.activity-details p {
+    font-weight: bold;
+    margin: 0;
+}
+
+.activity-details span {
     color: #666;
-    font-size: 18px;
-    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+.activity-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.view-all {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #0070ba;
+    text-decoration: none;
+    font-weight: bold;
 }

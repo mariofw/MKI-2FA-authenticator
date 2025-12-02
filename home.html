@@ -3,35 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>PayPal Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Welcome, User!</h1>
-            <button id="logout-button">Logout</button>
-        </div>
-        <div class="content">
-            <h2>Secure Dashboard</h2>
-            <p>Your account is protected with two-factor authentication for enhanced security.</p>
-        </div>
+    <div class="paypal-container">
+        <header class="paypal-header">
+            <div class="logo">
+                <i class="fab fa-paypal"></i>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#">Activity</a></li>
+                    <li><a href="#">Send & Request</a></li>
+                    <li><a href="#">Wallet</a></li>
+                    <li><a href="#">Help</a></li>
+                </ul>
+            </nav>
+            <div class="user-menu">
+                <i class="fas fa-bell"></i>
+                <i class="fas fa-cog"></i>
+                <button id="logout-button">Logout</button>
+            </div>
+        </header>
+
+        <main class="paypal-main">
+            <section class="balance-card">
+                <h2>PayPal Balance</h2>
+                <div class="balance-amount">$0.00 USD</div>
+                <div class="balance-actions">
+                    <button>Add Money</button>
+                    <button>Transfer Money</button>
+                </div>
+            </section>
+
+            <section class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div class="activity-filters">
+                    <input type="text" placeholder="Search transactions">
+                    <button><i class="fas fa-filter"></i> Filter</button>
+                </div>
+                <ul>
+                    <li class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-store"></i></div>
+                        <div class="activity-details">
+                            <p>Spotify</p>
+                            <span>June 28, 2024</span>
+                        </div>
+                        <div class="activity-amount">-$9.99</div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-user-friends"></i></div>
+                        <div class="activity-details">
+                            <p>Payment from John Doe</p>
+                            <span>June 27, 2024</span>
+                        </div>
+                        <div class="activity-amount">+$50.00</div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="activity-details">
+                            <p>eBay</p>
+                            <span>June 25, 2024</span>
+                        </div>
+                        <div class="activity-amount">-$124.50</div>
+                    </li>
+                </ul>
+                <a href="#" class="view-all">View All Activity</a>
+            </section>
+        </main>
     </div>
     <script>
-
         function logoutUser() {
-            // remove any localStorage keys that represent the current user/session
             Object.keys(localStorage).forEach(key => {
                 if (key.startsWith('currentUser') || key === 'authToken' || key === 'session' || key === 'loggedIn') {
                     localStorage.removeItem(key);
                 }
             });
-            // return to login page
             window.location.href = 'index.html';
        }
 
-        // Check if user is logged in
         const currentEmail = localStorage.getItem("currentUser.email");
         if (!currentEmail) {
             alert("Please login first.");
