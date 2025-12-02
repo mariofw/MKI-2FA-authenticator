@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -8,7 +7,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-app.use(cors()); // allow Live Server requests
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('.'));
 
@@ -76,9 +75,9 @@ app.get('/api/generate-2fa', async (req, res) => {
     // Build otpauth url manually — guaranteed format
     const otpauthUrl = buildOtpauthUrl({
       secret,
-      label: 'SecureApp',
+      label: 'AlatBayar',
       userEmail: email,
-      issuer: 'SecureApp',
+      issuer: 'AlatBayar',
       algorithm: 'SHA1',
       digits: 6,
       period: 30
