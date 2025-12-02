@@ -38,14 +38,13 @@ const twoFactorAuth = {
             alert("No email provided");
             return;
         }
-        
         localStorage.setItem("currentUser.email", email);
-        const secret = localStorage.getItem(`2fa.${email}.secret`);
+        const is2faEnabled = localStorage.getItem(`2fa.${email}.enabled`) === "true";
 
-        if (!secret) {
-            window.location.href = "setup-2fa.html";
-        } else {
+        if (is2faEnabled) {
             window.location.href = "verify-2fa.html";
+        } else {
+            window.location.href = "setup-2fa.html";
         }
     },
 
@@ -65,6 +64,24 @@ const twoFactorAuth = {
     }
 };
 
+function redirectToPanel(email) {
+    if (utils.isAdmin(email)) {
+        window.location.href = "admin.html";
+    } else {
+        window.location.href = "home.html";
+    }
+}
+
+function processLogin(email) {
+    localStorage.setItem("currentUser.email", email);
+    const is2faEnabled = localStorage.getItem(`2fa.${email}.enabled`) === "true";
+    if (is2faEnabled) {
+        window.location.href = "verify-2fa.html";
+    } else {
+        redirectToPanel(email);
+    }
+}
+
 // Google OAuth handler
 function handleCredentialResponse(response) {
     const id_token = response.credential;
@@ -83,7 +100,7 @@ function handleCredentialResponse(response) {
             utils.saveUsers(users);
         }
 
-        twoFactorAuth.require2FA(payload.email);
+        processLogin(payload.email);
     } catch (error) {
         console.error('Google OAuth error:', error);
         alert('Authentication failed. Please try again.');
@@ -113,12 +130,12 @@ loginForm?.querySelector('form')?.addEventListener('submit', (e) => {
     // Demo credentials check
     if ((email === 'admin@admin.com' && password === 'admin') || 
         (email === 'user@user.com' && password === 'user')) {
-        twoFactorAuth.require2FA(email);
+        processLogin(email);
     } else {
         // Check stored users
         const user = utils.findUserByEmail(email);
         if (user) {
-            twoFactorAuth.require2FA(email);
+            processLogin(email);
         } else {
             alert('Invalid credentials');
         }
