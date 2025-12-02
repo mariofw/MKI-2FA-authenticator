@@ -5,30 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .settings-dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 200px;
+        }
+        .settings-dropdown ul {
+            list-style: none;
+            padding: 10px 0;
+            margin: 0;
+        }
+        .settings-dropdown li {
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+        .settings-dropdown li:hover {
+            background-color: #f7f9fa;
+        }
+        .user-menu {
+            position: relative;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Admin Dashboard</h1>
-            <button id="logout-button">Logout</button>
-        </div>
-        <div class="content">
-            <h2>User Management</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- User rows will be inserted here dynamically -->
-                </tbody>
-            </table>
-        </div>
+    <div class="paypal-container">
+        <header class="paypal-header">
+            <div class="logo">
+                <i class="fab fa-paypal"></i>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Admin Home</a></li>
+                </ul>
+            </nav>
+            <div class="user-menu">
+                <i class="fas fa-bell"></i>
+                <i id="settings-icon" class="fas fa-cog"></i>
+                <div id="settings-dropdown" class="settings-dropdown">
+                    <ul>
+                        <li id="toggle-2fa-button"></li>
+                    </ul>
+                </div>
+                <button id="logout-button">Logout</button>
+            </div>
+        </header>
+
+        <main class="paypal-main">
+            <div class="content">
+                <h2>User Management</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- User rows will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
     </div>
+    <script src="script.js"></script>
     <script>
         // Admin-specific functionality
         const userTableBody = document.querySelector('tbody');
@@ -74,30 +124,68 @@
             });
         }
 
-          // Logout - clear session keys only and redirect to login
-        function logoutUser() {
-            // remove any localStorage keys that represent the current user/session
-            Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('currentUser') || key === 'authToken' || key === 'session' || key === 'loggedIn') {
-                    localStorage.removeItem(key);
-                }
-            });
-            // return to login page
-            window.location.href = 'index.html';
-       }
-
-        // Check if user is admin
         const currentEmail = localStorage.getItem("currentUser.email");
-        if (!currentEmail || (currentEmail !== "admin@admin.com" && currentEmail !== "mrakaazwar@gmail.com")) {
+        if (!currentEmail || !utils.isAdmin(currentEmail)) {
             alert("Access denied. Admin privileges required.");
             window.location.href = "index.html";
         }
 
-        document.addEventListener('DOMContentLoaded', renderTable);
         document.addEventListener('DOMContentLoaded', () => {
             renderTable();
+
             const logoutButton = document.getElementById('logout-button');
-            if (logoutButton) logoutButton.addEventListener('click', logoutUser);
+            if (logoutButton) logoutButton.addEventListener('click', () => {
+                localStorage.removeItem("currentUser.email");
+                window.location.href = 'index.html';
+            });
+
+            const settingsIcon = document.getElementById('settings-icon');
+            const settingsDropdown = document.getElementById('settings-dropdown');
+            const toggle2faButton = document.getElementById('toggle-2fa-button');
+
+            function check2FAStatus() {
+                const is2faEnabled = !!localStorage.getItem(`2fa.${currentEmail}.enabled`);
+                
+                if (is2faEnabled) {
+                    toggle2faButton.textContent = 'Disable 2FA';
+                } else {
+                    toggle2faButton.textContent = 'Enable 2FA';
+                }
+                return is2faEnabled;
+            }
+
+            function toggle2FA() {
+                const is2faEnabled = check2FAStatus();
+
+                if (is2faEnabled) {
+                    if (confirm('Are you sure you want to disable 2FA? This will reduce your account security.')) {
+                        localStorage.removeItem(`2fa.${currentEmail}.enabled`);
+                        alert('2FA has been disabled.');
+                        check2FAStatus();
+                        settingsDropdown.style.display = 'none';
+                    }
+                } else {
+                    if (confirm('You will be redirected to the 2FA setup page.')) {
+                        window.location.href = 'setup-2fa.html';
+                    }
+                }
+            }
+
+            settingsIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isDisplayed = settingsDropdown.style.display === 'block';
+                settingsDropdown.style.display = isDisplayed ? 'none' : 'block';
+            });
+
+            toggle2faButton.addEventListener('click', toggle2FA);
+
+            window.addEventListener('click', (event) => {
+                if (!settingsDropdown.contains(event.target) && !settingsIcon.contains(event.target)) {
+                    settingsDropdown.style.display = 'none';
+                }
+            });
+
+            check2FAStatus();
         });
     </script>
 </body>
