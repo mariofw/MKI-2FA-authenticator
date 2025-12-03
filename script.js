@@ -4,6 +4,12 @@ const CONFIG = {
     adminEmails: ['admin@admin.com', 'mrakaazwar@gmail.com']
 };
 
+const LOGIN_ATTEMPTS_CONFIG = {
+    maxAttempts: 5,
+    timeoutSeconds: 30,
+    storageKey: 'userManagement.loginAttempts'
+};
+
 // DOM elements
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
@@ -17,6 +23,23 @@ const utils = {
     saveUsers: (users) => localStorage.setItem(CONFIG.userStorageKey, JSON.stringify(users)),
     
     findUserByEmail: (email) => utils.getUsers().find(u => u.email === email),
+
+    getLoginAttempts: (email) => {
+        const attempts = JSON.parse(localStorage.getItem(LOGIN_ATTEMPTS_CONFIG.storageKey)) || {};
+        return attempts[email] || { count: 0, timeout: 0 };
+    },
+    
+    setLoginAttempts: (email, data) => {
+        const attempts = JSON.parse(localStorage.getItem(LOGIN_ATTEMPTS_CONFIG.storageKey)) || {};
+        attempts[email] = data;
+        localStorage.setItem(LOGIN_ATTEMPTS_CONFIG.storageKey, JSON.stringify(attempts));
+    },
+
+    resetLoginAttempts: (email) => {
+        const attempts = JSON.parse(localStorage.getItem(LOGIN_ATTEMPTS_CONFIG.storageKey)) || {};
+        delete attempts[email];
+        localStorage.setItem(LOGIN_ATTEMPTS_CONFIG.storageKey, JSON.stringify(attempts));
+    },
     
     isAdmin: (email) => CONFIG.adminEmails.includes(email),
     
@@ -127,17 +150,44 @@ loginForm?.querySelector('form')?.addEventListener('submit', (e) => {
     const email = formData.get('email') || e.target.querySelector('input[type="email"]').value;
     const password = formData.get('password') || e.target.querySelector('input[type="password"]').value;
 
+    const loginAttempts = utils.getLoginAttempts(email);
+    const now = Date.now();
+
+    if (loginAttempts.count >= LOGIN_ATTEMPTS_CONFIG.maxAttempts && loginAttempts.timeout > now) {
+        const remainingSeconds = Math.ceil((loginAttempts.timeout - now) / 1000);
+        alert(`Too many failed login attempts. Please try again in ${remainingSeconds} seconds.`);
+        return;
+    }
+
+    const handleInvalidLogin = () => {
+        const newAttempts = {
+            count: (loginAttempts.count || 0) + 1,
+            timeout: 0
+        };
+
+        if (newAttempts.count >= LOGIN_ATTEMPTS_CONFIG.maxAttempts) {
+            newAttempts.timeout = Date.now() + (LOGIN_ATTEMPTS_CONFIG.timeoutSeconds * 1000);
+            const remainingSeconds = LOGIN_ATTEMPTS_CONFIG.timeoutSeconds;
+            alert(`Too many failed login attempts. Please try again in ${remainingSeconds} seconds.`);
+        } else {
+            alert('Invalid credentials');
+        }
+        utils.setLoginAttempts(email, newAttempts);
+    };
+
     // Demo credentials check
-    if ((email === 'admin@admin.com' && password === 'admin') || 
+    if ((email === 'admin@admin.com' && password === 'admin') ||
         (email === 'user@user.com' && password === 'user')) {
+        utils.resetLoginAttempts(email);
         processLogin(email);
     } else {
         // Check stored users
         const user = utils.findUserByEmail(email);
-        if (user) {
+        if (user && user.password === password) {
+            utils.resetLoginAttempts(email);
             processLogin(email);
         } else {
-            alert('Invalid credentials');
+            handleInvalidLogin();
         }
     }
 });
